@@ -1,7 +1,8 @@
 import tldextract
-
+import hashlib
 class URLManager:
   urlList = []
+  urlVisitedHash = []
   domain = ""
   index = 0
   def __init__(self, url):
@@ -9,8 +10,8 @@ class URLManager:
     URLManager.domain = self.getDomainName(url)
     
   def getURL(self):
-    if(self.index < len(self.urlList)):
-      url = self.urlList[self.index]
+    if(self.index < len(self.urlList) -1):
+      url = self.urlList[self.index + 1]
       self.index += 1
       return url
     else:
@@ -21,13 +22,13 @@ class URLManager:
     if(self.checkInDomain(url)):
       self.urlList.append(url)  
     
-    
+ 
   def getDomainName(self,url):
     return tldextract.extract(url).domain
 
-  @staticmethod
-  def checkInDomain(url):
-    if url == URLManager.domain:
+ 
+  def checkInDomain(self,url):
+    if self.getDomainName(url) == URLManager.domain:
       return True
     else:
       return False
