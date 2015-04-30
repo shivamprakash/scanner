@@ -1,13 +1,14 @@
 import tldextract
 import hashlib
+from urllib2 import urlopen
 class URLManager:
   urlList = []
   urlVisitedHash = []
   domain = ""
   index = 0
   def __init__(self, url):
-    self.urlList.append(url)
     URLManager.domain = self.getDomainName(url)
+    self.putURL(url)
     
   def getURL(self):
     if(self.index < len(self.urlList) -1):
@@ -19,7 +20,7 @@ class URLManager:
 
 
   def putURL(self,url):
-    if(self.checkInDomain(url)):
+    if(self.checkInDomain(url) and not self.alreadyParsed(url)):
       self.urlList.append(url)  
     
  
@@ -33,4 +34,10 @@ class URLManager:
     else:
       return False
 
-    
+  def alreadyParsed(self,url):
+    hashValue = hashlib.md5(url).hexdigest() 
+    if hashValue in self.urlVisitedHash:
+      return True
+    else:
+      self.urlVisitedHash.append(hashValue)
+      return False
