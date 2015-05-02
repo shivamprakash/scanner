@@ -11,8 +11,8 @@ class URLManager:
     self.putURL(url)
     
   def getURL(self):
-    if(self.index < len(self.urlList) -1):
-      url = self.urlList[self.index + 1]
+    if(self.index < len(self.urlList)):
+      url = self.urlList[self.index]
       self.index += 1
       return url
     else:

@@ -2,11 +2,12 @@
 # from array import array
 import mechanize
 from urllib2 import HTTPError
+from Manager import URLManager
 # from bs4 import BeautifulSoup as BS
 
 urlList = []
 br = mechanize.Browser()
-
+obj = URLManager("http://stackoverflow.com/")
 # Browser options
 # Ignore robots.txt. Do not do this without thought and consideration.
 br.set_handle_robots(False)
@@ -29,16 +30,19 @@ def printForms():
 
 def crawlUrls():
     for link in br.links():
-        print link
-        '''if not link.url.startswith("http"):
+        #print link
+        if not link.url.startswith("http"):
             if link.url != '/' and link.url != '#':
-                urlList.append(link.url)'''
+                obj.putURL(link.url)
+                #print link
+                urlList.append(link.url)
             # res = br.open(link.url)
             # http_message = res.info()
             # if http_message.maintype == 'text':
             #     print br.response().read()
+    
 
-def crawlNewPages():
+def crawlNewPages(objccr):
     for url in urlList:
         try:
             br.open(url)
@@ -52,9 +56,17 @@ def crawlNewPages():
             print "Error code", e.code
 
 def init():
-    br.open('http://10.99.1.2/')
-    # print br.response().read()
-    crawlUrls()
+    
+    
+    curr_url = obj.getURL()
+    while (curr_url != "end"):
+        print curr_url
+        br.open(curr_url)
+        crawlUrls()
+        print curr_url
+        curr_url = obj.getURL()
+        
+
     #printForms()
 
 
@@ -73,4 +85,4 @@ def init():
 
 
 init()
-crawlNewPages()
+#crawlNewPages()
