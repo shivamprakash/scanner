@@ -3,86 +3,47 @@
 import mechanize
 from urllib2 import HTTPError
 from Manager import URLManager
-# from bs4 import BeautifulSoup as BS
+import urlparse
+from urllib2 import HTTPError
 
-urlList = []
 br = mechanize.Browser()
-obj = URLManager("http://stackoverflow.com/")
-# Browser options
-# Ignore robots.txt. Do not do this without thought and consideration.
+obj = URLManager("http://adamdoupe.com/teaching/classes/cse591-security-and-vulnerability-analysis-s15/")
 br.set_handle_robots(False)
-
-# Don't add Referer (sic) header
 br.set_handle_referer(False)
-
-# Don't handle Refresh re directions
 br.set_handle_refresh(False)
 
-
-def printForms():
-    for form in br.forms():
-        print "Form name: %s" % form.name
-        # print form
-        for control in form.controls:
-            print "Type = %s" % control.type
-            print "Name = %s" % control.name
-        print "\n"
+def is_absolute(url):
+    return bool(urlparse.urlparse(url).netloc)
 
 def crawlUrls():
     for link in br.links():
         #print link
-        if not link.url.startswith("http"):
-            if link.url != '/' and link.url != '#':
+        if link.url != '/' and not link.url.startswith("#") and not link.url.startswith("mailto"):
+            if not is_absolute(link.url):
+                obj.putURL(link.base_url[:-1] + link.url)
+            else:
                 obj.putURL(link.url)
-                #print link
-                urlList.append(link.url)
-            # res = br.open(link.url)
-            # http_message = res.info()
-            # if http_message.maintype == 'text':
-            #     print br.response().read()
-    
+                
 
-def crawlNewPages(objccr):
-    for url in urlList:
-        try:
-            br.open(url)
-            # res = br.open(url)
-            # http_message = res.info()
-            # if http_message.maintype == 'text':
-            # print br.response().read()
-            # crawlUrls()
-            printForms()
-        except HTTPError, e:
-            print "Error code", e.code
+def is_html(res):
+    http_message = res.info()
+    #print http_message
+    if 'content-type' in http_message and 'text/html' in http_message["content-type"]:
+        return True
+    return False
 
-def init():
-    
-    
+
+def main():
     curr_url = obj.getURL()
-    while (curr_url != "end"):
-        print curr_url
-        br.open(curr_url)
-        crawlUrls()
-        print curr_url
-        curr_url = obj.getURL()
-        
+    while curr_url != "end":
+        print "curr_url:   " + curr_url
+        try:
+            res = br.open(curr_url)
+            if is_html(res):
+                crawlUrls()
+            curr_url = obj.getURL()
+        except (mechanize.HTTPError, mechanize.URLError):
+            curr_url = obj.getURL()
 
-    #printForms()
-
-
-# response = br.response().read()
-# Getting the response in beautifulsoup
-# soup = BS(response)
-
-# print urlList
-# myList = sorted(set(urlList))
-# print myList
-
-# for product in soup.find_all('a'):
-#     #printing product name and url
-#     print "Product Name : %s" % product.get('href')
-#     print "======================="
-
-
-init()
-#crawlNewPages()
+if __name__ == "__main__":
+    main()

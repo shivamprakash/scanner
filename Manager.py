@@ -1,6 +1,7 @@
 import tldextract
 import hashlib
 from urllib2 import urlopen
+from urlparse import urlparse
 class URLManager:
   urlList = []
   urlVisitedHash = []
@@ -20,10 +21,19 @@ class URLManager:
 
 
   def putURL(self,url):
+    url = self.removeExtra(url)
     if(self.checkInDomain(url) and not self.alreadyParsed(url)):
       self.urlList.append(url)  
+      #print "appending  : " + url
     
  
+  def removeExtra(self,url):
+    
+    o = urlparse(url)
+    url = o[0] + "://" + o[1] + o[2]
+    return url
+
+
   def getDomainName(self,url):
     return tldextract.extract(url).domain
 
