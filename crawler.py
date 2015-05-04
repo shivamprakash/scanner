@@ -20,6 +20,9 @@ def crawlUrls():
         #print link
         if link.url != '/' and not link.url.startswith("#") and not link.url.startswith("mailto"):
             if not is_absolute(link.url):
+                # print link
+                # print "base_url : " +link.base_url[:-1]
+                # print "url : " +link.url
                 obj.putURL(link.base_url[:-1] + link.url)
             else:
                 obj.putURL(link.url)
@@ -27,7 +30,6 @@ def crawlUrls():
 
 def is_html(res):
     http_message = res.info()
-    #print http_message
     if 'content-type' in http_message and 'text/html' in http_message["content-type"]:
         return True
     return False
@@ -36,13 +38,14 @@ def is_html(res):
 def main():
     curr_url = obj.getURL()
     while curr_url != "end":
-        print "curr_url:   " + curr_url
+        print curr_url
         try:
             res = br.open(curr_url)
             if is_html(res):
                 crawlUrls()
             curr_url = obj.getURL()
         except (mechanize.HTTPError, mechanize.URLError):
+            #obj.removeFalseURL(curr_url)
             curr_url = obj.getURL()
 
 if __name__ == "__main__":
