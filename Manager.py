@@ -1,8 +1,9 @@
 from collections import deque
 from ConfigParser import SafeConfigParser
-import pickle
+import simplejson
 import tldextract
 import hashlib
+import cPickle
 import mechanize
 from urllib2 import urlopen
 from urlparse import urlparse
@@ -21,7 +22,7 @@ class URLManager:
     self.putURL(url)
     self.fileName = parser.get('Manager', 'fileName')
     self.CONST_SIZE = parser.get('Manager', 'list_capacity')
-    self.fileList = deque(maxlen = int(self.CONST_SIZE))
+    #self.fileList = deque(maxlen = int(self.CONST_SIZE))
     
     
   def getURL(self):
@@ -29,8 +30,6 @@ class URLManager:
       url = self.urlList.pop()
       if( len(self.fileList) < self.CONST_SIZE):
         self.fileList.append(url)
-      else:
-        self.appendToFile()
       return url
     else:
       self.appendToFile()
@@ -38,7 +37,6 @@ class URLManager:
 
 
   def putURL(self,url):
-    #print url
     url = self.removeExtra(url)
     if(self.checkInDomain(url) and not self.alreadyParsed(url)):
       self.urlList.append(url)
@@ -47,14 +45,13 @@ class URLManager:
   
 
   def appendToFile(self):
-    foDest = open( self.fileName, "a")
-    for item in self.fileList:
-      foDest.write("%s\n" % item)
-    self.fileList.clear()
+    cPickle.dump(self.fileList, open('url.p', 'wb')) 
+    obj = cPickle.load(open('url.p', 'rb'))
+    print len(obj)
       
 
   def removeFalseURL(self,url):
-    self.urlList.remove(url)
+    self.fileList.remove(url)
     
 
   def removeExtra(self,url):
