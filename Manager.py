@@ -46,8 +46,6 @@ class URLManager:
 
   def appendToFile(self):
     cPickle.dump(self.fileList, open('url.p', 'wb')) 
-    obj = cPickle.load(open('url.p', 'rb'))
-    print len(obj)
       
 
   def removeFalseURL(self,url):
@@ -92,3 +90,8 @@ class URLManager:
     else:
       self.urlVisitedHash.append(hashValue)
       return False
+
+  def getUrlList(self):
+    return cPickle.load(open('url.p', 'rb'))
+    
+  

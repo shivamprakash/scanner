@@ -48,6 +48,6 @@ def main():
         except (mechanize.HTTPError, mechanize.URLError):
             obj.removeFalseURL(curr_url)
             curr_url = obj.getURL()
-
+    print "no of url: " + str(len(obj.getUrlList()))
 if __name__ == "__main__":
     main()
